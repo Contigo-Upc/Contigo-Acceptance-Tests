@@ -4,19 +4,31 @@ Feature: US-05 - Edición de datos de perfil
   Para mantener mi información actualizada
 
 #-------------------------------------------------------------------------------------------
-Scenario: Edición exitosa
+Scenario Outline: Edición exitosa
 
-    Given el usuario está en "Mi perfil"
-    When modifica un dato y presiona "Guardar"
-    Then el sistema actualiza la información y confirma el cambio
+    Given el usuario "<nombre>" está en "Mi perfil"
+    When cambia el campo "<campo>" a "<nuevo_valor>" y presiona "Guardar cambios"
+    Then el sistema actualiza la información y muestra el mensaje "<mensaje>"
+
+    Examples: Datos de entrada y salida
+      | nombre             | campo             | nuevo_valor           | mensaje                                 |
+      | María Elena Quispe | Edad              | 68                    | Tus datos ya están actualizados, María. |
+      | Jorge Ramos        | Número de celular | 923 456 789           | Tus datos ya están actualizados, Jorge. |
+      | Lucía Fernández    | Nombre completo   | Lucía Fernández Rojas | Tus datos ya están actualizados, Lucía. |
 
 
 #-------------------------------------------------------------------------------------------
-Scenario: Dato con formato inválido
+Scenario Outline: Dato con formato inválido
 
-    Given el usuario ingresa un número de celular con formato incorrecto
+    Given el usuario ingresa el número de celular "<celular>" con formato incorrecto
     When intenta guardar
-    Then el sistema muestra un mensaje indicando el formato correcto
+    Then el sistema muestra el mensaje "<mensaje>"
+
+    Examples: Datos de entrada y salida
+      | celular      | mensaje                                                                         |
+      | 987 654 32   | Escribe los 9 números de tu celular, empezando con 9. Por ejemplo: 987 654 321. |
+      | 887 654 321  | Escribe los 9 números de tu celular, empezando con 9. Por ejemplo: 987 654 321. |
+      | 987 654 3210 | Escribe los 9 números de tu celular, empezando con 9. Por ejemplo: 987 654 321. |
 
 
 #-------------------------------------------------------------------------------------------
