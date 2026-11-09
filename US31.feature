@@ -4,24 +4,43 @@ Feature: US-31 - Mensajes de error en lenguaje sencillo
   Para entender rápidamente qué salió mal
 
 #-------------------------------------------------------------------------------------------
-Scenario: Error interno del sistema
+Scenario Outline: Error interno del sistema
 
-    Given ocurre un error técnico en la plataforma
-    When la aplicación falla en cargar el trámite
-    Then el sistema muestra un mensaje amigable como "Tuvimos un problema temporal, por favor inténtalo en unos minutos" en lugar de un código de error como "Error 500"
+    Given ocurre el error técnico "<codigo_tecnico>" en la plataforma
+    When la aplicación falla en cargar el trámite "<tramite>"
+    Then el sistema muestra el mensaje "<mensaje>" en lugar del código "<codigo_tecnico>"
 
-
-#-------------------------------------------------------------------------------------------
-Scenario: Error por información incorrecta
-
-    Given el usuario ingresa un dato erróneo
-    When el sistema lo detecta
-    Then muestra un mensaje claro como "El número de DNI debe tener 8 números" en lugar de "Data type mismatch"
+    Examples: Datos de entrada y salida
+      | tramite            | codigo_tecnico | mensaje                                                                   |
+      | Pago de luz        | Error 500      | Tuvimos un problema temporal, por favor inténtalo en unos minutos.        |
+      | Renovación de DNI  | Error 503      | Estamos haciendo mejoras en Contigo. Vuelve a intentarlo en unos minutos. |
+      | Consulta de deudas | Error 504      | La página tardó mucho en responder. Inténtalo otra vez en un momento.     |
 
 
 #-------------------------------------------------------------------------------------------
-Scenario: Apoyo visual en el error
+Scenario Outline: Error por información incorrecta
 
-    Given se muestra un mensaje de error
+    Given el usuario está en el paso "Anota tus datos" del trámite "<tramite>"
+    When escribe "<dato_ingresado>" en el campo "<campo>" y presiona "Siguiente"
+    Then el sistema muestra el mensaje "<mensaje>" en lugar de "Data type mismatch"
+
+    Examples: Datos de entrada y salida
+      | tramite           | campo                | dato_ingresado | mensaje                                               |
+      | Renovación de DNI | Número de DNI        | 4578123        | Escribe los 8 números de tu DNI, sin espacios.        |
+      | Pago de luz       | Número de suministro | 24A8135        | Escribe 7 u 8 números, sin espacios ni letras.        |
+      | Pago de internet  | Número de contrato   | 5678           | Escribe entre 6 y 10 números, sin espacios ni letras. |
+      | Pago de agua      | Monto a pagar (S/)   | cuarenta       | Escribe el monto solo con números. Ejemplo: 85.50     |
+
+
+#-------------------------------------------------------------------------------------------
+Scenario Outline: Apoyo visual en el error
+
+    Given se muestra el aviso "<aviso>"
     When el usuario lo visualiza
-    Then el mensaje está acompañado de un ícono de advertencia claro (como un triángulo amarillo o exclamación)
+    Then el aviso está acompañado del ícono "<icono>" dentro de un círculo de color <color>
+
+    Examples: Datos de salida
+      | aviso                                 | icono | color    |
+      | Hay 2 datos que necesitan tu atención | !     | rojo     |
+      | La foto salió borrosa                 | !     | amarillo |
+      | La foto tiene poca luz                | !     | amarillo |
