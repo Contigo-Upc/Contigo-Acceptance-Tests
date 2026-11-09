@@ -4,11 +4,17 @@ Feature: US-46 - Consultar historial de trámites
   Para revisar los procedimientos que ya realicé
 
 #-------------------------------------------------------------------------------------------
-Scenario: Visualización del historial
+Scenario Outline: Visualización del historial
 
     Given el usuario ingresa a "Historial"
     When accede a la sección
-    Then el sistema muestra sus trámites realizados
+    Then el sistema muestra el trámite "<tramite>" realizado el "<fecha>"
+
+    Examples: Datos de salida
+      | tramite            | fecha      |
+      | Pago de luz        | 05/11/2026 |
+      | Renovación de DNI  | 12/11/2026 |
+      | Consulta de deudas | 20/11/2026 |
 
 
 #-------------------------------------------------------------------------------------------
@@ -20,8 +26,13 @@ Scenario: Historial vacío
 
 
 #-------------------------------------------------------------------------------------------
-Scenario: Historial actualizado
+Scenario Outline: Historial actualizado
 
-    Given el usuario finalizó un trámite
+    Given el usuario finalizó el trámite "<tramite>" el "<fecha>"
     When vuelve a consultar su historial
-    Then el sistema muestra el nuevo trámite registrado
+    Then el sistema muestra "<tramite>" con fecha "<fecha>" como el nuevo trámite registrado
+
+    Examples: Datos de entrada y salida
+      | tramite          | fecha      |
+      | Pago de agua     | 28/11/2026 |
+      | Pago de internet | 03/12/2026 |
