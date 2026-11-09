@@ -4,24 +4,42 @@ Feature: US-35 - Recuperación de datos tras error de conexión
   Para no tener que reiniciar el trámite desde cero cuando vuelva la señal
 
 #-------------------------------------------------------------------------------------------
-Scenario: Pérdida de conexión
+Scenario Outline: Pérdida de conexión
 
-    Given el usuario está en el paso 3 de un trámite
+    Given el usuario está en el paso <paso> de <total> del trámite "<tramite>" y escribió "<dato_ingresado>" en el campo "<campo>"
     When se pierde la conexión a internet
-    Then el sistema muestra un mensaje indicando "Sin conexión" y guarda localmente los datos ingresados
+    Then el sistema muestra el mensaje "Sin conexión" y guarda localmente el dato "<dato_ingresado>"
+
+    Examples: Datos de entrada
+      | tramite            | paso | total | campo                | dato_ingresado |
+      | Pago de luz        | 5    | 7     | Número de suministro | 2468135        |
+      | Renovación de DNI  | 5    | 7     | Número de DNI        | 45781236       |
+      | Consulta de deudas | 4    | 6     | Número de DNI        | 70215538       |
 
 
 #-------------------------------------------------------------------------------------------
-Scenario: Reconexión y continuación
+Scenario Outline: Reconexión y continuación
 
-    Given el sistema guardó el progreso de un trámite por falta de internet
+    Given el sistema guardó el progreso del trámite "<tramite>" en el paso <paso> de <total> por falta de internet
     When el usuario recupera la conexión
-    Then la app le permite reanudar el trámite exactamente en el paso donde se quedó
+    Then la app muestra el botón "Continuar donde lo dejaste (paso <paso> de <total>)" y reanuda el trámite exactamente en ese paso
+
+    Examples: Datos de entrada y salida
+      | tramite            | paso | total |
+      | Pago de luz        | 5    | 7     |
+      | Pago de internet   | 3    | 7     |
+      | Consulta de deudas | 4    | 6     |
 
 
 #-------------------------------------------------------------------------------------------
-Scenario: Abandono de trámite offline
+Scenario Outline: Abandono de trámite offline
 
-    Given el usuario decide cerrar la app tras perder conexión
+    Given el usuario cerró la app en el paso <paso> del trámite "<tramite>" tras perder la conexión
     When vuelva a abrir la app con internet
-    Then el sistema le preguntará si desea recuperar el trámite pendiente o descartarlo
+    Then el sistema le pregunta si desea recuperar el trámite con el botón "Continuar con el paso <paso>" o descartarlo con el botón "Descartar este trámite"
+
+    Examples: Datos de entrada y salida
+      | tramite           | paso |
+      | Pago de luz       | 5    |
+      | Renovación de DNI | 3    |
+      | Pago de agua      | 2    |
