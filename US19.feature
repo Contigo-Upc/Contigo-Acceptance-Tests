@@ -4,24 +4,40 @@ Feature: US-19 - Extracción de datos desde documentos de identidad
   Para que la app complete automáticamente mis datos personales en un trámite
 
 #-------------------------------------------------------------------------------------------
-Scenario: Extracción exitosa
+Scenario Outline: Extracción exitosa
 
-    Given un trámite requiere datos del DNI
-    When el usuario fotografía el documento
-    Then el sistema extrae nombre y número de documento y los completa en el formulario
+    Given el trámite "<tramite>" requiere datos del DNI
+    When el usuario fotografía su documento
+    Then el sistema completa el formulario con el nombre "<nombre>" y el número de DNI "<dni>"
+
+    Examples: Datos de entrada y salida
+      | tramite            | nombre                    | dni      |
+      | Renovación de DNI  | Rosa Elvira Huamán Torres | 41827365 |
+      | Consulta de deudas | Teodoro Mamani Quispe     | 07294518 |
+      | Renovación de DNI  | Carmen Salazar Vega       | 25638194 |
 
 
 #-------------------------------------------------------------------------------------------
-Scenario: Documento dañado o vencido
+Scenario Outline: Documento dañado o vencido
 
-    Given el DNI fotografiado está dañado o vencido
+    Given el DNI fotografiado está "<estado>"
     When el sistema intenta procesarlo
-    Then muestra un mensaje indicando que no pudo validar el documento
+    Then muestra el mensaje "<mensaje>"
+
+    Examples: Datos de entrada y salida
+      | estado  | mensaje                                                                                                 |
+      | dañado  | No pudimos validar tu DNI porque no se lee completo. Vuelve a tomar la foto o escribe tus datos a mano. |
+      | vencido | No pudimos validar tu DNI porque está vencido. Escribe tus datos a mano o renuévalo con la guía.        |
 
 
 #-------------------------------------------------------------------------------------------
-Scenario: Confirmación de datos extraídos
+Scenario Outline: Confirmación de datos extraídos
 
-    Given el sistema completó los campos automáticamente
-    When el usuario revisa la información
-    Then puede confirmar o corregir los datos antes de continuar
+    Given el sistema completó el nombre "<nombre>" y el DNI "<dni>" automáticamente
+    When el usuario revisa la información y presiona "<boton>"
+    Then el sistema <resultado>
+
+    Examples: Datos de entrada y salida
+      | nombre                    | dni      | boton                  | resultado                                           |
+      | Rosa Elvira Huamán Torres | 41827365 | Sí, todo está correcto | confirma los datos y pasa al siguiente paso         |
+      | Teodoro Mamani Quispe     | 07294518 | Corregir datos         | abre los campos para corregirlos antes de continuar |
