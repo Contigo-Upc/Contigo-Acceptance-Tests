@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.0] - 2026-11-09
+
+### Cambiado
+- Los escenarios de las 50 historias de usuario ahora son `Scenario Outline` con tablas `Examples` de datos de entrada y salida (141 de 150 escenarios).
+- Los datos usan los mensajes y valores reales de la app donde la funcionalidad ya existe.
+
 ## [1.0.1] - 2026-11-05
 
 ### Agregado
