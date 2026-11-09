@@ -4,19 +4,31 @@ Feature: US-15 - Modo de práctica con datos simulados
   Para perder el miedo antes de hacerlo con datos reales
 
 #-------------------------------------------------------------------------------------------
-Scenario: Práctica completada con éxito
+Scenario Outline: Práctica completada con éxito
 
-    Given el usuario selecciona "Practicar este trámite"
-    When completa el flujo con datos simulados
-    Then el sistema indica que fue una simulación y no se realizó ninguna operación real
+    Given el usuario selecciona "Practicar con datos de ejemplo" en el trámite "<tramite>"
+    When completa el flujo con el dato simulado "<dato_simulado>"
+    Then el sistema muestra el mensaje "<mensaje>" sin realizar ninguna operación real
+
+    Examples: Datos de entrada y salida
+      | tramite           | dato_simulado | mensaje                                                                                         |
+      | Pago de luz       | 1234567       | Practicaste todo el recorrido. Cuando quieras hacer el trámite de verdad, empieza la guía real. |
+      | Pago de agua      | 7654321       | Practicaste todo el recorrido. Cuando quieras hacer el trámite de verdad, empieza la guía real. |
+      | Renovación de DNI | 12345678      | Practicaste todo el recorrido. Cuando quieras hacer el trámite de verdad, empieza la guía real. |
 
 
 #-------------------------------------------------------------------------------------------
-Scenario: Error intencional durante la práctica
+Scenario Outline: Error intencional durante la práctica
 
-    Given el usuario ingresa un dato incorrecto a propósito durante la práctica
+    Given el usuario escribe "<dato_incorrecto>" a propósito en el campo "<campo>" durante la práctica
     When el sistema lo detecta
-    Then muestra la misma orientación que mostraría en un trámite real
+    Then muestra el mensaje "<mensaje>", el mismo que mostraría en un trámite real
+
+    Examples: Datos de entrada y salida
+      | campo                | dato_incorrecto | mensaje                                           |
+      | Número de suministro | 12345           | Escribe 7 u 8 números, sin espacios ni letras.    |
+      | Monto a pagar (S/)   | ochenta         | Escribe el monto solo con números. Ejemplo: 85.50 |
+      | Número de DNI        | 1234ABCD        | Escribe los 8 números de tu DNI, sin espacios.    |
 
 
 #-------------------------------------------------------------------------------------------
